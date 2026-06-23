@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>aspenGhostCoder — AI-powered Aspen Plus flowsheet builder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue:       #378ADD;
+      --blue-dark:  #185FA5;
+      --blue-dim:   rgba(55,138,221,0.10);
+      --blue-border:rgba(55,138,221,0.30);
+      --text:       #1a1a1a;
+      --text-sec:   #5a5a5a;
+      --text-ter:   #9a9a9a;
+      --bg:         #ffffff;
+      --bg-sec:     #f7f7f5;
+      --border:     rgba(0,0,0,0.10);
+      --border-med: rgba(0,0,0,0.18);
+      --radius:     10px;
+      --mono:       'JetBrains Mono', monospace;
+      --sans:       'Inter', sans-serif;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --text:      #e8e8e6;
+        --text-sec:  #9a9896;
+        --text-ter:  #6a6864;
+        --bg:        #111110;
+        --bg-sec:    #1a1a18;
+        --border:    rgba(255,255,255,0.10);
+        --border-med:rgba(255,255,255,0.18);
+      }
+    }
+
+    body { font-family: var(--sans); color: var(--text); background: var(--bg); line-height: 1.6; }
+
+    /* ── NAV ── */
+    nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 48px;
+      border-bottom: 0.5px solid var(--border);
+      position: sticky; top: 0; background: var(--bg);
+      z-index: 100;
+    }
+    .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .nav-logo-icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: var(--blue-dark);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .nav-logo-icon svg { width: 18px; height: 18px; }
+    .nav-wordmark { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; color: var(--text); }
+    .nav-wordmark span { color: var(--blue); }
+    .nav-links { display: flex; gap: 28px; list-style: none; }
+    .nav-links a { font-size: 13px; color: var(--text-sec); text-decoration: none; }
+    .nav-links a:hover { color: var(--text); }
+    .nav-cta {
+      font-size: 13px; font-weight: 500; padding: 7px 16px;
+      border: 0.5px solid var(--blue); border-radius: 6px; color: var(--blue);
+      cursor: pointer; background: transparent; font-family: var(--sans);
+    }
+    .nav-cta:hover { background: var(--blue-dim); }
+
+    /* ── HERO ── */
+    .hero {
+      max-width: 720px; margin: 0 auto;
+      padding: 88px 48px 64px; text-align: center;
+    }
+    .eyebrow {
+      display: inline-block; font-size: 11px; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--blue);
+      border: 0.5px solid var(--blue-border); border-radius: 20px;
+      padding: 4px 14px; margin-bottom: 30px;
+      font-family: var(--mono); font-weight: 500;
+    }
+    .hero h1 {
+      font-size: 42px; font-weight: 300; line-height: 1.16; letter-spacing: -1px;
+      margin-bottom: 22px;
+    }
+    .hero h1 strong { font-weight: 600; }
+    .hero p {
+      font-size: 17px; color: var(--text-sec); max-width: 480px;
+      margin: 0 auto 38px; line-height: 1.7;
+    }
+    .btn-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn-primary {
+      padding: 11px 26px; background: var(--blue-dark); color: #fff;
+      border: none; border-radius: 7px; font-size: 14px; font-weight: 500;
+      cursor: pointer; font-family: var(--sans); text-decoration: none;
+      display: inline-block;
+    }
+    .btn-primary:hover { background: #1268b3; }
+    .btn-ghost {
+      padding: 11px 22px; background: transparent; color: var(--text-sec);
+      border: 0.5px solid var(--border-med); border-radius: 7px;
+      font-size: 14px; cursor: pointer; font-family: var(--sans);
+      text-decoration: none; display: inline-block;
+    }
+    .btn-ghost:hover { color: var(--text); background: var(--bg-sec); }
+
+    /* ── DEMO WINDOW ── */
+    .demo-wrap { margin: 0 48px 64px; }
+    .demo-window {
+      border: 0.5px solid var(--border-med); border-radius: var(--radius);
+      overflow: hidden; background: var(--bg);
+    }
+    .demo-bar {
+      display: flex; align-items: center; gap: 8px; padding: 10px 16px;
+      border-bottom: 0.5px solid var(--border); background: var(--bg-sec);
+    }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot-r { background: #FF5F57; } .dot-y { background: #FEBC2E; } .dot-g { background: #28C840; }
+    .demo-title { font-size: 12px; color: var(--text-ter); margin-left: 8px; font-family: var(--mono); }
+    .demo-cols { display: flex; }
+    .demo-col { flex: 1; padding: 20px; border-right: 0.5px solid var(--border); }
+    .demo-col:last-child { border-right: none; }
+    .demo-col-label {
+      font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--text-ter); margin-bottom: 10px; font-family: var(--mono);
+    }
+    .demo-box {
+      font-size: 13px; line-height: 1.7;
+      background: var(--bg-sec); border-radius: 6px; padding: 12px;
+      border: 0.5px solid var(--border); min-height: 88px;
+    }
+    .demo-box.italic { font-style: italic; color: var(--text-sec); }
+    .demo-box.code { font-family: var(--mono); font-size: 11px; color: var(--text-sec); }
+    .c-blue { color: var(--blue); }
+    .c-green { color: #28C840; }
+    .c-yellow { color: #FEBC2E; }
+    .demo-arrow { display: flex; align-items: center; justify-content: center; padding: 0 6px; color: var(--blue); font-size: 18px; align-self: center; flex-shrink: 0; }
+
+    /* ── TRUST BAR ── */
+    .trust {
+      display: flex; justify-content: center; align-items: center;
+      gap: 36px; flex-wrap: wrap;
+      padding: 20px 48px;
+      border-top: 0.5px solid var(--border); border-bottom: 0.5px solid var(--border);
+      background: var(--bg-sec);
+    }
+    .trust-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-sec); }
+    .trust-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--blue); flex-shrink: 0; }
+
+    /* ── SECTIONS ── */
+    section { padding: 72px 48px; max-width: 960px; margin: 0 auto; }
+    .section-label {
+      font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--blue); font-family: var(--mono); font-weight: 500; margin-bottom: 12px;
+    }
+    .section-title { font-size: 28px; font-weight: 300; letter-spacing: -0.5px; margin-bottom: 8px; }
+    .section-title strong { font-weight: 600; }
+    .section-sub { font-size: 14px; color: var(--text-sec); margin-bottom: 48px; max-width: 440px; }
+
+    /* ── FEATURES ── */
+    .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+    .feature-card {
+      padding: 22px; border: 0.5px solid var(--border); border-radius: var(--radius);
+      background: var(--bg); transition: border-color 0.15s;
+    }
+    .feature-card:hover { border-color: var(--blue-border); }
+    .feature-icon {
+      width: 38px; height: 38px; border-radius: 8px; background: var(--blue-dim);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 14px; font-size: 18px;
+    }
+    .feature-title { font-size: 14px; font-weight: 500; margin-bottom: 6px; }
+    .feature-desc { font-size: 13px; color: var(--text-sec); line-height: 1.65; }
+
+    /* ── WORKFLOW ── */
+    .workflow-steps { display: flex; flex-direction: column; gap: 0; margin-top: 40px; }
+    .workflow-step { display: flex; gap: 20px; }
+    .step-spine { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
+    .step-num {
+      width: 32px; height: 32px; border-radius: 50%;
+      border: 0.5px solid var(--blue); display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 500; color: var(--blue);
+      font-family: var(--mono);
+    }
+    .step-line { width: 1px; flex: 1; background: var(--border); margin: 6px 0; min-height: 28px; }
+    .step-content { padding-bottom: 36px; padding-top: 4px; }
+    .step-title { font-size: 15px; font-weight: 500; margin-bottom: 5px; }
+    .step-desc { font-size: 13px; color: var(--text-sec); line-height: 1.65; }
+    .step-tag {
+      display: inline-block; margin-top: 9px; font-size: 11px; padding: 3px 9px;
+      border-radius: 4px; font-family: var(--mono);
+      background: var(--blue-dim); color: var(--blue); border: 0.5px solid var(--blue-border);
+    }
+
+    /* ── CALLOUT ── */
+    .callout-wrap { padding: 0 48px; max-width: 960px; margin: 0 auto; }
+    .callout {
+      padding: 30px 34px; border: 0.5px solid var(--blue-border);
+      border-left: 3px solid var(--blue); border-radius: 0 8px 8px 0;
+      background: var(--blue-dim); display: flex; gap: 18px; align-items: flex-start;
+    }
+    .callout-icon { font-size: 20px; flex-shrink: 0; margin-top: 2px; color: var(--blue); }
+    .callout-title { font-size: 15px; font-weight: 500; margin-bottom: 6px; }
+    .callout-text { font-size: 13px; color: var(--text-sec); line-height: 1.7; }
+
+    /* ── CTA ── */
+    .cta-wrap { padding: 0 48px 72px; max-width: 960px; margin: 0 auto; }
+    .cta-block {
+      padding: 52px 40px; border: 0.5px solid var(--border-med);
+      border-radius: var(--radius); text-align: center; background: var(--bg-sec);
+      margin-top: 48px;
+    }
+    .cta-block h2 { font-size: 26px; font-weight: 300; letter-spacing: -0.4px; margin-bottom: 10px; }
+    .cta-block h2 strong { font-weight: 600; }
+    .cta-block p { font-size: 14px; color: var(--text-sec); margin-bottom: 30px; }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 20px 48px; border-top: 0.5px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
+    }
+    .footer-copy { font-size: 12px; color: var(--text-ter); }
+    .footer-links { display: flex; gap: 20px; }
+    .footer-links a { font-size: 12px; color: var(--text-ter); text-decoration: none; }
+    .footer-links a:hover { color: var(--text-sec); }
+
+    /* ── CURSOR BLINK ── */
+    .cursor {
+      display: inline-block; width: 2px; height: 13px;
+      background: var(--blue); vertical-align: middle;
+      animation: blink 1s step-end infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 700px) {
+      nav { padding: 14px 20px; }
+      .nav-links { display: none; }
+      .hero { padding: 60px 24px 48px; }
+      .hero h1 { font-size: 30px; }
+      .demo-wrap { margin: 0 20px 48px; }
+      .demo-cols { flex-direction: column; }
+      .demo-arrow { transform: rotate(90deg); padding: 6px 0; }
+      .trust { gap: 16px; padding: 16px 20px; }
+      section { padding: 48px 24px; }
+      .callout-wrap, .cta-wrap { padding: 0 24px; }
+      footer { padding: 16px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a class="nav-logo" href="#">
+      <div class="nav-logo-icon">
+        <svg viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="9" cy="5" r="2.5" stroke="white" stroke-width="1.2"/>
+          <circle cx="4" cy="13" r="2.5" stroke="white" stroke-width="1.2"/>
+          <circle cx="14" cy="13" r="2.5" stroke="white" stroke-width="1.2"/>
+          <line x1="9" y1="7.5" x2="4" y2="10.5" stroke="white" stroke-width="1"/>
+          <line x1="9" y1="7.5" x2="14" y2="10.5" stroke="white" stroke-width="1"/>
+        </svg>
+      </div>
+      <span class="nav-wordmark">Aspen<span>Ghost</span>Coder</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#features">Features</a></li>
+      <li><a href="#how-it-works">How it works</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <button class="nav-cta" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">Request access</button>
+  </nav>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="eyebrow">AI-powered process simulation</div>
+    <h1>Describe your flowsheet.<br><strong>We'll build it in Aspen.</strong></h1>
+    <p>aspenGhostCoder translates plain-English process descriptions into working Aspen Plus simulations — instantly. Your numbers stay yours; AI handles the wiring.</p>
+    <div class="btn-row">
+      <a class="btn-primary" href="#contact">Get early access</a>
+      <a class="btn-ghost" href="#how-it-works">See how it works ↓</a>
+    </div>
+  </div>
+
+  <!-- DEMO WINDOW -->
+  <div class="demo-wrap">
+    <div class="demo-window">
+      <div class="demo-bar">
+        <div class="dot dot-r"></div>
+        <div class="dot dot-y"></div>
+        <div class="dot dot-g"></div>
+        <span class="demo-title">aspenghostcoder — live session</span>
+      </div>
+      <div class="demo-cols">
+        <div class="demo-col">
+          <div class="demo-col-label">you describe</div>
+          <div class="demo-box italic">
+            "Feed goes into COL1. COL1's bottoms go into COL2. COL2's distillate is the final product."<span class="cursor"></span>
+          </div>
+        </div>
+        <div class="demo-arrow">→</div>
+        <div class="demo-col">
+          <div class="demo-col-label">Claude extracts structure</div>
+          <div class="demo-box code">
+            <span class="c-blue">"blocks"</span>: [<br>
+            &nbsp;&nbsp;{ <span class="c-blue">"id"</span>: <span class="c-green">"COL1"</span>, <span class="c-blue">"type"</span>: <span class="c-green">"RadFrac"</span> },<br>
+            &nbsp;&nbsp;{ <span class="c-blue">"id"</span>: <span class="c-green">"COL2"</span>, <span class="c-blue">"type"</span>: <span class="c-green">"RadFrac"</span> }<br>
+            ],<br>
+            <span class="c-blue">"streams"</span>: [<br>
+            &nbsp;&nbsp;FEED → COL1,<br>
+            &nbsp;&nbsp;COL1.bottoms → COL2,<br>
+            &nbsp;&nbsp;COL2.distillate → PRODUCT<br>
+            ]
+          </div>
+        </div>
+        <div class="demo-arrow">→</div>
+        <div class="demo-col">
+          <div class="demo-col-label">Aspen .bkp built</div>
+          <div class="demo-box code" style="color:var(--text-ter)">
+            <span class="c-green">✓</span> COL1 created (RadFrac)<br>
+            <span class="c-green">✓</span> COL2 created (RadFrac)<br>
+            <span class="c-green">✓</span> Stream S1 connected<br>
+            <span class="c-green">✓</span> FEED configured<br>
+            <span class="c-green">✓</span> Saved to .bkp<br>
+            <span class="c-blue">→</span> Open in Aspen Plus
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRUST BAR -->
+  <div class="trust">
+    <div class="trust-item"><div class="trust-dot"></div>Zero hallucination on process data</div>
+    <div class="trust-item"><div class="trust-dot"></div>Works with Aspen Plus V14+</div>
+    <div class="trust-item"><div class="trust-dot"></div>Windows COM automation</div>
+    <div class="trust-item"><div class="trust-dot"></div>Built for process engineers</div>
+  </div>
+
+  <!-- FEATURES -->
+  <section id="features">
+    <div class="section-label">What it does</div>
+    <h2 class="section-title"><strong>Every feature</strong> built for engineers</h2>
+    <p class="section-sub">No prompt engineering, no simulation guesswork. Describe what you want and review what gets built.</p>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="feature-icon">💬</div>
+        <div class="feature-title">Plain-English parsing</div>
+        <div class="feature-desc">Describe block connections in your own words. Claude extracts the topology — no special syntax required.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🛡️</div>
+        <div class="feature-title">No hallucinated numbers</div>
+        <div class="feature-desc">Flow rates, pressures, stage counts — all entered by you via form fields. AI never touches critical process values.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">⚙️</div>
+        <div class="feature-title">Direct Aspen automation</div>
+        <div class="feature-desc">Uses Aspen Plus's COM interface to build blocks, connect streams, and set parameters — all programmatically.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📄</div>
+        <div class="feature-title">Ready-to-run .bkp files</div>
+        <div class="feature-desc">Output is a native Aspen Plus backup file. Open it, review it, and run it — no manual setup needed.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🖥️</div>
+        <div class="feature-title">Streamlit UI</div>
+        <div class="feature-desc">A clean, local web app with fields for every parameter. No command line, no config files.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔗</div>
+        <div class="feature-title">Multi-column support</div>
+        <div class="feature-desc">Build flowsheets with multiple distillation columns, inter-column streams, and split product outputs.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CALLOUT -->
+  <div class="callout-wrap">
+    <div class="callout">
+      <div class="callout-icon">⚠️</div>
+      <div>
+        <div class="callout-title">Why AI handles structure, not numbers</div>
+        <div class="callout-text">Process simulation requires exact numerical inputs. A wrong flow rate or pressure can send a simulation in the wrong direction — or worse, give a plausible-looking wrong answer. aspenGhostCoder uses AI only for what it's good at: understanding relationships and layout. Every numerical value comes directly from you.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <section id="how-it-works">
+    <div class="section-label">How it works</div>
+    <h2 class="section-title"><strong>Three steps</strong> to a simulation</h2>
+    <p class="section-sub">From description to a working Aspen file in under a minute.</p>
+    <div class="workflow-steps">
+      <div class="workflow-step">
+        <div class="step-spine">
+          <div class="step-num">1</div>
+          <div class="step-line"></div>
+        </div>
+        <div class="step-content">
+          <div class="step-title">Enter your numbers</div>
+          <div class="step-desc">Fill in components, feed flow rate, pressure, and stage counts directly in the form. These values go straight to Aspen — the AI never sees them.</div>
+          <span class="step-tag">hallucination-free zone</span>
+        </div>
+      </div>
+      <div class="workflow-step">
+        <div class="step-spine">
+          <div class="step-num">2</div>
+          <div class="step-line"></div>
+        </div>
+        <div class="step-content">
+          <div class="step-title">Describe the structure</div>
+          <div class="step-desc">Write how your blocks connect in plain English. "COL1's bottoms feed into COL2" is enough. Claude extracts the block list and stream connections using a structured tool call.</div>
+          <span class="step-tag">claude-sonnet-4-6</span>
+        </div>
+      </div>
+      <div class="workflow-step">
+        <div class="step-spine">
+          <div class="step-num">3</div>
+        </div>
+        <div class="step-content">
+          <div class="step-title">Build and open in Aspen</div>
+          <div class="step-desc">Click the build button. aspenGhostCoder creates the blocks, wires the streams, sets stage counts and feed conditions, and saves a .bkp file ready to open in Aspen Plus.</div>
+          <span class="step-tag">Aspen Plus V14 COM API</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <div class="cta-wrap" id="contact">
+    <div class="cta-block">
+      <h2>Ready to stop clicking through Aspen?<br><strong>Start describing instead.</strong></h2>
+      <p>Currently in early access for process engineers. Windows + Aspen Plus V14 required.</p>
+      <div class="btn-row">
+        <a class="btn-primary" href="mailto:hello@aspenghostcoder.com">Request early access</a>
+        <a class="btn-ghost" href="https://github.com">View on GitHub</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-copy">© 2026 aspenGhostCoder</div>
+    <div class="footer-links">
+      <a href="https://github.com">GitHub</a>
+      <a href="mailto:hello@aspenghostcoder.com">Contact</a>
+    </div>
+  </footer>
+
+</body>
+</html>
