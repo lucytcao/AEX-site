@@ -277,7 +277,7 @@
   <div class="hero">
     <div class="eyebrow">AI-powered process simulation</div>
     <h1>Describe your flowsheet.<br><strong>We'll build it in Aspen.</strong></h1>
-    <p>AEX translates plain-English process descriptions into working Aspen Plus simulations — instantly. Your numbers stay yours; AI handles the wiring.</p>
+    <p>AEX translates plain-English process descriptions into working Aspen Plus simulations - building streams, blocks, and thermodynamic parameters automatically. Runs locally or in a private VPC so your process data never leaves your network.</p>
     <div class="btn-row">
       <a class="btn-primary" href="#contact">Get early access</a>
       <a class="btn-ghost" href="#how-it-works">See how it works ↓</a>
@@ -297,7 +297,7 @@
         <div class="demo-col">
           <div class="demo-col-label">you describe</div>
           <div class="demo-box italic">
-            "Feed goes into COL1. COL1's bottoms go into COL2. COL2's distillate is the final product."<span class="cursor"></span>
+            "Model a 3-stage distillation column separating ethanol and water at 1 atm with a feed rate of 100 kmol/hr."<span class="cursor"></span>
           </div>
         </div>
         <div class="demo-arrow">→</div>
@@ -336,6 +336,7 @@
     <div class="trust-item"><div class="trust-dot"></div>Zero hallucination on process data</div>
     <div class="trust-item"><div class="trust-dot"></div>Works with Aspen Plus V14+</div>
     <div class="trust-item"><div class="trust-dot"></div>Windows COM automation</div>
+    <div class="trust-item"><div class="trust-dot"></div>Runs locally or private VPC</div>
     <div class="trust-item"><div class="trust-dot"></div>Built for process engineers</div>
   </div>
 
@@ -366,14 +367,14 @@
         <div class="feature-desc">Output is a native Aspen Plus backup file. Open it, review it, and run it — no manual setup needed.</div>
       </div>
       <div class="feature-card">
-        <div class="feature-icon">🖥️</div>
-        <div class="feature-title">Streamlit UI</div>
-        <div class="feature-desc">A clean, local web app with fields for every parameter. No command line, no config files.</div>
+        <div class="feature-icon">🌡️</div>
+        <div class="feature-title">Thermodynamic parameter input</div>
+        <div class="feature-desc">AEX automatically inputs thermodynamic parameters from your description — components, property methods, and conditions — so you don't have to hunt through menus.</div>
       </div>
       <div class="feature-card">
-        <div class="feature-icon">🔗</div>
-        <div class="feature-title">Multi-column support</div>
-        <div class="feature-desc">Build flowsheets with multiple distillation columns, inter-column streams, and split product outputs.</div>
+        <div class="feature-icon">🔒</div>
+        <div class="feature-title">Runs locally or private VPC</div>
+        <div class="feature-desc">The AI runs entirely on your machine or within a private VPC. Your proprietary process data never leaves your network.</div>
       </div>
     </div>
   </section>
@@ -384,7 +385,7 @@
       <div class="callout-icon">⚠️</div>
       <div>
         <div class="callout-title">Why AI handles structure, not numbers</div>
-        <div class="callout-text">Process simulation requires exact numerical inputs. A wrong flow rate or pressure can send a simulation in the wrong direction — or worse, give a plausible-looking wrong answer. AEX uses AI only for what it's good at: understanding relationships and layout. Every numerical value comes directly from you.</div>
+        <div class="callout-text">Process simulation requires exact numerical inputs. A wrong flow rate or pressure can send a simulation in the wrong direction — or worse, give a plausible-looking wrong answer. AEX uses AI only for what it's good at: understanding relationships, layout, and thermodynamic setup. Every critical numerical value comes directly from you. And because the AI runs locally or in a private VPC, your proprietary process data never leaves your network.</div>
       </div>
     </div>
   </div>
