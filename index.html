@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AEX — AI-powered Aspen Plus flowsheet builder</title>
+  <title>aspenGhostCoder — AI-powered Aspen Plus flowsheet builder</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
@@ -233,6 +233,100 @@
     }
     @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
 
+    /* ── ANIMATED FLOWSHEET ── */
+    .flowsheet-wrap {
+      padding: 16px; background: var(--bg-sec);
+      border-top: 0.5px solid var(--border);
+    }
+    .flowsheet-label {
+      font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--text-ter); margin-bottom: 10px; font-family: var(--mono);
+      padding: 0 4px;
+    }
+    .flowsheet-canvas {
+      width: 100%; height: 180px; position: relative; overflow: hidden;
+    }
+    .flowsheet-canvas svg { width: 100%; height: 100%; }
+
+    /* Node animations */
+    .fs-node { transition: opacity 0.3s; }
+    .fs-node rect, .fs-node polygon {
+      fill: var(--bg); stroke: var(--blue-border); stroke-width: 1;
+    }
+    .fs-node.active rect, .fs-node.active polygon {
+      stroke: var(--blue); stroke-width: 1.5;
+      filter: drop-shadow(0 0 4px rgba(55,138,221,0.35));
+    }
+    .fs-node text {
+      font-family: var(--mono); font-size: 9px; fill: var(--text-ter);
+    }
+    .fs-node.active text { fill: var(--blue); }
+    .fs-node .node-type {
+      font-size: 7px; fill: var(--text-ter);
+    }
+
+    /* Animated stream lines */
+    .fs-stream { stroke: var(--border-med); stroke-width: 1; fill: none; }
+    .fs-stream.active { stroke: var(--blue); stroke-width: 1.5; }
+    .fs-stream-dot {
+      fill: var(--blue); opacity: 0;
+    }
+    .fs-stream-dot.flowing { opacity: 1; }
+
+    /* Build progress bar */
+    .fs-progress-wrap {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 4px 0;
+    }
+    .fs-progress-bar {
+      flex: 1; height: 2px; background: var(--border); border-radius: 2px; overflow: hidden;
+    }
+    .fs-progress-fill {
+      height: 100%; background: var(--blue); border-radius: 2px;
+      width: 0%; transition: width 0.4s ease;
+    }
+    .fs-status-text {
+      font-size: 10px; font-family: var(--mono); color: var(--blue);
+      min-width: 160px; text-align: right;
+    }
+
+    /* ── TWO-COLUMN HOW IT WORKS ── */
+    .hiw-cols {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-top: 40px;
+    }
+    .hiw-col {
+      border: 0.5px solid var(--border); border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .hiw-col-header {
+      padding: 16px 20px; border-bottom: 0.5px solid var(--border);
+      background: var(--bg-sec); display: flex; align-items: center; gap: 10px;
+    }
+    .hiw-col-badge {
+      font-size: 10px; font-family: var(--mono); padding: 3px 8px;
+      border-radius: 4px; font-weight: 500;
+    }
+    .hiw-col-badge.new-badge {
+      background: var(--blue-dim); color: var(--blue); border: 0.5px solid var(--blue-border);
+    }
+    .hiw-col-badge.edit-badge {
+      background: rgba(40,200,64,0.08); color: #1fa832; border: 0.5px solid rgba(40,200,64,0.25);
+    }
+    @media (prefers-color-scheme: dark) {
+      .hiw-col-badge.edit-badge { color: #28C840; border-color: rgba(40,200,64,0.3); background: rgba(40,200,64,0.08); }
+    }
+    .hiw-col-title {
+      font-size: 14px; font-weight: 500; color: var(--text);
+    }
+    .hiw-col-body { padding: 20px; }
+    .hiw-col .workflow-steps { margin-top: 0; }
+    .hiw-col .step-content { padding-bottom: 24px; }
+
+    @media (max-width: 700px) {
+      .hiw-cols { grid-template-columns: 1fr; gap: 20px; }
+      .flowsheet-canvas { height: 140px; }
+    }
+
     /* ── RESPONSIVE ── */
     @media (max-width: 700px) {
       nav { padding: 14px 20px; }
@@ -263,7 +357,7 @@
           <line x1="9" y1="7.5" x2="14" y2="10.5" stroke="white" stroke-width="1"/>
         </svg>
       </div>
-      <span class="nav-wordmark">AEX</span>
+      <span class="nav-wordmark">Aspen<span>Ghost</span>Coder</span>
     </a>
     <ul class="nav-links">
       <li><a href="#features">Features</a></li>
@@ -277,7 +371,7 @@
   <div class="hero">
     <div class="eyebrow">AI-powered process simulation</div>
     <h1>Describe your flowsheet.<br><strong>We'll build it in Aspen.</strong></h1>
-    <p>AEX translates plain-English process descriptions into working Aspen Plus simulations - building streams, blocks, and thermodynamic parameters automatically. Runs locally or in a private VPC so your process data never leaves your network.</p>
+    <p>AEX translates plain-English process descriptions into working Aspen Plus simulations — building streams, blocks, and thermodynamic parameters automatically. Your proprietary process data stays on your machine; only structural descriptions are sent externally for parsing.</p>
     <div class="btn-row">
       <a class="btn-primary" href="#contact">Get early access</a>
       <a class="btn-ghost" href="#how-it-works">See how it works ↓</a>
@@ -291,13 +385,13 @@
         <div class="dot dot-r"></div>
         <div class="dot dot-y"></div>
         <div class="dot dot-g"></div>
-        <span class="demo-title">AEX — live session</span>
+        <span class="demo-title">aspenghostcoder — live session</span>
       </div>
       <div class="demo-cols">
         <div class="demo-col">
           <div class="demo-col-label">you describe</div>
           <div class="demo-box italic">
-            "Model a 3-stage distillation column separating ethanol and water at 1 atm with a feed rate of 100 kmol/hr."<span class="cursor"></span>
+            "Feed goes into COL1. COL1's bottoms go into COL2. COL2's distillate is the final product."<span class="cursor"></span>
           </div>
         </div>
         <div class="demo-arrow">→</div>
@@ -328,15 +422,212 @@
           </div>
         </div>
       </div>
+
+      <!-- ANIMATED FLOWSHEET -->
+      <div class="flowsheet-wrap">
+        <div class="flowsheet-label">Flowsheet — live build preview</div>
+        <div class="flowsheet-canvas">
+          <svg id="fs-svg" viewBox="0 0 680 170" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+            <!-- Stream paths (drawn first, behind nodes) -->
+            <!-- FEED → MIX -->
+            <line id="s-feed-mix" class="fs-stream" x1="60" y1="85" x2="120" y2="85"/>
+            <!-- MIX → HX -->
+            <line id="s-mix-hx" class="fs-stream" x1="175" y1="85" x2="235" y2="85"/>
+            <!-- HX → COL1 -->
+            <line id="s-hx-col1" class="fs-stream" x1="285" y1="85" x2="340" y2="85"/>
+            <!-- COL1 distillate up -->
+            <polyline id="s-col1-dist" class="fs-stream" points="365,58 365,30 455,30 455,58"/>
+            <!-- COL1 bottoms → COL2 -->
+            <line id="s-col1-col2" class="fs-stream" x1="390" y1="85" x2="445" y2="85"/>
+            <!-- COL2 distillate → PRODUCT -->
+            <line id="s-col2-prod" class="fs-stream" x1="505" y1="72" x2="610" y2="72"/>
+            <!-- COL2 bottoms out -->
+            <line id="s-col2-bot" class="fs-stream" x1="505" y1="98" x2="610" y2="98"/>
+            <!-- RECYCLE arc back -->
+            <path id="s-recycle" class="fs-stream" d="M610,30 Q640,28 640,85 Q640,142 610,140 L150,140 Q120,140 120,115 L120,110" />
+
+            <!-- Animated dots on streams -->
+            <circle id="dot-feed" class="fs-stream-dot" r="3" cx="60" cy="85"/>
+            <circle id="dot-mix-hx" class="fs-stream-dot" r="3" cx="175" cy="85"/>
+            <circle id="dot-hx-col1" class="fs-stream-dot" r="3" cx="235" cy="85"/>
+            <circle id="dot-col1-col2" class="fs-stream-dot" r="3" cx="390" cy="85"/>
+            <circle id="dot-col2-prod" class="fs-stream-dot" r="3" cx="505" cy="72"/>
+            <circle id="dot-col2-bot" class="fs-stream-dot" r="3" cx="505" cy="98"/>
+            <circle id="dot-recycle" class="fs-stream-dot" r="3" cx="610" cy="30"/>
+
+            <!-- FEED block -->
+            <g id="n-feed" class="fs-node">
+              <rect x="6" y="68" width="54" height="34" rx="5"/>
+              <text x="33" y="82" text-anchor="middle" font-weight="500">FEED</text>
+              <text x="33" y="93" text-anchor="middle" class="node-type">Material</text>
+            </g>
+
+            <!-- MIXER -->
+            <g id="n-mix" class="fs-node">
+              <rect x="120" y="68" width="55" height="34" rx="5"/>
+              <text x="147" y="82" text-anchor="middle" font-weight="500">MIX</text>
+              <text x="147" y="93" text-anchor="middle" class="node-type">Mixer</text>
+            </g>
+
+            <!-- HEAT EXCHANGER -->
+            <g id="n-hx" class="fs-node">
+              <rect x="235" y="68" width="50" height="34" rx="5"/>
+              <text x="260" y="82" text-anchor="middle" font-weight="500">HX-1</text>
+              <text x="260" y="93" text-anchor="middle" class="node-type">Heater</text>
+            </g>
+
+            <!-- COL1 — taller column shape -->
+            <g id="n-col1" class="fs-node">
+              <rect x="340" y="45" width="50" height="80" rx="4"/>
+              <text x="365" y="82" text-anchor="middle" font-weight="500">COL1</text>
+              <text x="365" y="93" text-anchor="middle" class="node-type">RadFrac</text>
+              <!-- tray lines -->
+              <line x1="342" y1="68" x2="388" y2="68" stroke-width="0.5" stroke="rgba(55,138,221,0.2)"/>
+              <line x1="342" y1="75" x2="388" y2="75" stroke-width="0.5" stroke="rgba(55,138,221,0.2)"/>
+              <line x1="342" y1="100" x2="388" y2="100" stroke-width="0.5" stroke="rgba(55,138,221,0.2)"/>
+              <line x1="342" y1="107" x2="388" y2="107" stroke-width="0.5" stroke="rgba(55,138,221,0.2)"/>
+            </g>
+
+            <!-- COL2 -->
+            <g id="n-col2" class="fs-node">
+              <rect x="445" y="52" width="60" height="72" rx="4"/>
+              <text x="475" y="85" text-anchor="middle" font-weight="500">COL2</text>
+              <text x="475" y="96" text-anchor="middle" class="node-type">RadFrac</text>
+              <line x1="447" y1="72" x2="503" y2="72" stroke-width="0.5" stroke="rgba(55,138,221,0.2)"/>
+              <line x1="447" y1="80" x2="503" y2="80" stroke-width="0.5" stroke="rgba(55,138,221,0.2)"/>
+              <line x1="447" y1="100" x2="503" y2="100" stroke-width="0.5" stroke="rgba(55,138,221,0.2)"/>
+            </g>
+
+            <!-- PRODUCT labels -->
+            <g id="n-prod" class="fs-node">
+              <rect x="612" y="58" width="58" height="28" rx="5"/>
+              <text x="641" y="72" text-anchor="middle" font-weight="500">PRODUCT</text>
+              <text x="641" y="82" text-anchor="middle" class="node-type">Distillate</text>
+            </g>
+            <g id="n-bot" class="fs-node">
+              <rect x="612" y="84" width="58" height="28" rx="5"/>
+              <text x="641" y="96" text-anchor="middle" font-weight="500">BOTTOMS</text>
+              <text x="641" y="106" text-anchor="middle" class="node-type">Recycle</text>
+            </g>
+
+            <!-- Stream labels -->
+            <text id="lbl-feed" style="font-family:var(--mono);font-size:8px;fill:var(--text-ter);opacity:0" x="72" y="80">S-FEED</text>
+            <text id="lbl-s1" style="font-family:var(--mono);font-size:8px;fill:var(--text-ter);opacity:0" x="188" y="80">S1</text>
+            <text id="lbl-s2" style="font-family:var(--mono);font-size:8px;fill:var(--text-ter);opacity:0" x="248" y="80">S2</text>
+            <text id="lbl-s3" style="font-family:var(--mono);font-size:8px;fill:var(--text-ter);opacity:0" x="403" y="80">S3</text>
+            <text id="lbl-dist1" style="font-family:var(--mono);font-size:8px;fill:var(--text-ter);opacity:0" x="395" y="27">D1</text>
+            <text id="lbl-recycle" style="font-family:var(--mono);font-size:8px;fill:var(--text-ter);opacity:0" x="620" y="115">REC</text>
+          </svg>
+        </div>
+        <div class="fs-progress-wrap">
+          <div class="fs-progress-bar"><div class="fs-progress-fill" id="fs-prog"></div></div>
+          <div class="fs-status-text" id="fs-status">initializing…</div>
+        </div>
+      </div>
     </div>
   </div>
+
+  <script>
+  // ── Flowsheet animation engine ──
+  (function() {
+    const steps = [
+      { label: "placing FEED block…",   nodes: ["n-feed"],                    streams: [],                       dots: ["dot-feed"],        labels: ["lbl-feed"], pct: 10 },
+      { label: "placing MIX block…",    nodes: ["n-feed","n-mix"],             streams: ["s-feed-mix"],           dots: ["dot-feed"],        labels: ["lbl-feed"], pct: 20 },
+      { label: "placing HX-1…",         nodes: ["n-feed","n-mix","n-hx"],      streams: ["s-feed-mix","s-mix-hx"],dots: ["dot-mix-hx"],       labels: ["lbl-feed","lbl-s1"], pct: 32 },
+      { label: "placing COL1 (RadFrac)…",nodes: ["n-feed","n-mix","n-hx","n-col1"], streams: ["s-feed-mix","s-mix-hx","s-hx-col1"], dots: ["dot-hx-col1"], labels: ["lbl-feed","lbl-s1","lbl-s2"], pct: 48 },
+      { label: "placing COL2 (RadFrac)…",nodes: ["n-feed","n-mix","n-hx","n-col1","n-col2","n-prod","n-bot"], streams: ["s-feed-mix","s-mix-hx","s-hx-col1","s-col1-col2","s-col1-dist"], dots: ["dot-col1-col2"], labels: ["lbl-feed","lbl-s1","lbl-s2","lbl-s3","lbl-dist1"], pct: 64 },
+      { label: "wiring product streams…",nodes: ["n-feed","n-mix","n-hx","n-col1","n-col2","n-prod","n-bot"], streams: ["s-feed-mix","s-mix-hx","s-hx-col1","s-col1-col2","s-col1-dist","s-col2-prod","s-col2-bot"], dots: ["dot-col2-prod","dot-col2-bot"], labels: ["lbl-feed","lbl-s1","lbl-s2","lbl-s3","lbl-dist1"], pct: 80 },
+      { label: "adding recycle stream…", nodes: ["n-feed","n-mix","n-hx","n-col1","n-col2","n-prod","n-bot"], streams: ["s-feed-mix","s-mix-hx","s-hx-col1","s-col1-col2","s-col1-dist","s-col2-prod","s-col2-bot","s-recycle"], dots: ["dot-recycle"], labels: ["lbl-feed","lbl-s1","lbl-s2","lbl-s3","lbl-dist1","lbl-recycle"], pct: 92 },
+      { label: "✓ .bkp saved — ready to open", nodes: ["n-feed","n-mix","n-hx","n-col1","n-col2","n-prod","n-bot"], streams: ["s-feed-mix","s-mix-hx","s-hx-col1","s-col1-col2","s-col1-dist","s-col2-prod","s-col2-bot","s-recycle"], dots: [], labels: ["lbl-feed","lbl-s1","lbl-s2","lbl-s3","lbl-dist1","lbl-recycle"], pct: 100 },
+    ];
+
+    const allNodes = ["n-feed","n-mix","n-hx","n-col1","n-col2","n-prod","n-bot"];
+    const allStreams = ["s-feed-mix","s-mix-hx","s-hx-col1","s-col1-col2","s-col1-dist","s-col2-prod","s-col2-bot","s-recycle"];
+    const allDots = ["dot-feed","dot-mix-hx","dot-hx-col1","dot-col1-col2","dot-col2-prod","dot-col2-bot","dot-recycle"];
+    const allLabels = ["lbl-feed","lbl-s1","lbl-s2","lbl-s3","lbl-dist1","lbl-recycle"];
+
+    let stepIdx = 0;
+    const dotAnims = {}; // store per-dot animation state
+
+    function applyStep(s) {
+      // nodes
+      allNodes.forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.classList.toggle('active', s.nodes.includes(id));
+      });
+      // streams
+      allStreams.forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.classList.toggle('active', s.streams.includes(id));
+      });
+      // labels
+      allLabels.forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.style.opacity = s.labels.includes(id) ? '1' : '0';
+      });
+      // progress
+      document.getElementById('fs-prog').style.width = s.pct + '%';
+      document.getElementById('fs-status').textContent = s.label;
+    }
+
+    // Animate a dot along a line segment
+    function animateDotLine(dotId, x1, y1, x2, y2, dur, onDone) {
+      const el = document.getElementById(dotId);
+      if (!el) { onDone && onDone(); return; }
+      el.style.opacity = '1';
+      let start = null;
+      function frame(ts) {
+        if (!start) start = ts;
+        const t = Math.min((ts - start) / dur, 1);
+        el.setAttribute('cx', x1 + (x2 - x1) * t);
+        el.setAttribute('cy', y1 + (y2 - y1) * t);
+        if (t < 1) requestAnimationFrame(frame);
+        else { el.style.opacity = '0'; onDone && onDone(); }
+      }
+      requestAnimationFrame(frame);
+    }
+
+    const dotConfigs = {
+      'dot-feed':     { x1:6,   y1:85, x2:120, y2:85 },
+      'dot-mix-hx':   { x1:175, y1:85, x2:235, y2:85 },
+      'dot-hx-col1':  { x1:285, y1:85, x2:340, y2:85 },
+      'dot-col1-col2':{ x1:390, y1:85, x2:445, y2:85 },
+      'dot-col2-prod':{ x1:505, y1:72, x2:612, y2:72 },
+      'dot-col2-bot': { x1:505, y1:98, x2:612, y2:98 },
+      'dot-recycle':  { x1:610, y1:30, x2:150, y2:140 },
+    };
+
+    function runStep() {
+      const s = steps[stepIdx];
+      applyStep(s);
+      // fire dot animations for this step
+      s.dots.forEach(dotId => {
+        const cfg = dotConfigs[dotId];
+        if (cfg) animateDotLine(dotId, cfg.x1, cfg.y1, cfg.x2, cfg.y2, 700);
+      });
+      stepIdx = (stepIdx + 1) % steps.length;
+      if (stepIdx === 0) {
+        // brief pause at completion before restart
+        setTimeout(() => { stepIdx = 0; setTimeout(runStep, 400); }, 1800);
+      } else {
+        setTimeout(runStep, stepIdx === steps.length - 1 ? 1200 : 750);
+      }
+    }
+
+    // Start after a short delay
+    setTimeout(runStep, 600);
+  })();
+  </script>
 
   <!-- TRUST BAR -->
   <div class="trust">
     <div class="trust-item"><div class="trust-dot"></div>Zero hallucination on process data</div>
+    <div class="trust-item"><div class="trust-dot"></div>Proprietary data never leaves your machine</div>
     <div class="trust-item"><div class="trust-dot"></div>Works with Aspen Plus V14+</div>
     <div class="trust-item"><div class="trust-dot"></div>Windows COM automation</div>
-    <div class="trust-item"><div class="trust-dot"></div>Runs locally or private VPC</div>
     <div class="trust-item"><div class="trust-dot"></div>Built for process engineers</div>
   </div>
 
@@ -350,6 +641,11 @@
         <div class="feature-icon">💬</div>
         <div class="feature-title">Plain-English parsing</div>
         <div class="feature-desc">Describe block connections in your own words. Claude extracts the topology — no special syntax required.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔒</div>
+        <div class="feature-title">Your data stays local</div>
+        <div class="feature-desc">All proprietary process data and files remain on your machine. Only structural descriptions are sent externally for AI parsing — full on-premise/local inference is on our near-term roadmap.</div>
       </div>
       <div class="feature-card">
         <div class="feature-icon">🛡️</div>
@@ -367,14 +663,14 @@
         <div class="feature-desc">Output is a native Aspen Plus backup file. Open it, review it, and run it — no manual setup needed.</div>
       </div>
       <div class="feature-card">
-        <div class="feature-icon">🌡️</div>
-        <div class="feature-title">Thermodynamic parameter input</div>
-        <div class="feature-desc">AEX automatically inputs thermodynamic parameters from your description — components, property methods, and conditions — so you don't have to hunt through menus.</div>
+        <div class="feature-icon">🖥️</div>
+        <div class="feature-title">Streamlit UI</div>
+        <div class="feature-desc">A clean, local web app with fields for every parameter. No command line, no config files.</div>
       </div>
       <div class="feature-card">
-        <div class="feature-icon">🔒</div>
-        <div class="feature-title">Runs locally or private VPC</div>
-        <div class="feature-desc">The AI runs entirely on your machine or within a private VPC. Your proprietary process data never leaves your network.</div>
+        <div class="feature-icon">🔗</div>
+        <div class="feature-title">Multi-column support</div>
+        <div class="feature-desc">Build flowsheets with multiple distillation columns, inter-column streams, and split product outputs.</div>
       </div>
     </div>
   </section>
@@ -385,7 +681,7 @@
       <div class="callout-icon">⚠️</div>
       <div>
         <div class="callout-title">Why AI handles structure, not numbers</div>
-        <div class="callout-text">Process simulation requires exact numerical inputs. A wrong flow rate or pressure can send a simulation in the wrong direction — or worse, give a plausible-looking wrong answer. AEX uses AI only for what it's good at: understanding relationships, layout, and thermodynamic setup. Every critical numerical value comes directly from you. And because the AI runs locally or in a private VPC, your proprietary process data never leaves your network.</div>
+        <div class="callout-text">Process simulation requires exact numerical inputs. A wrong flow rate or pressure can send a simulation in the wrong direction — or worse, give a plausible-looking wrong answer. aspenGhostCoder uses AI only for what it's good at: understanding relationships and layout. Every numerical value comes directly from you. And because only structural descriptions are sent externally for parsing — never your actual process data or files — your proprietary information stays on your machine throughout.</div>
       </div>
     </div>
   </div>
@@ -393,41 +689,99 @@
   <!-- HOW IT WORKS -->
   <section id="how-it-works">
     <div class="section-label">How it works</div>
-    <h2 class="section-title"><strong>Three steps</strong> to a simulation</h2>
-    <p class="section-sub">From description to a working Aspen file in under a minute.</p>
-    <div class="workflow-steps">
-      <div class="workflow-step">
-        <div class="step-spine">
-          <div class="step-num">1</div>
-          <div class="step-line"></div>
+    <h2 class="section-title"><strong>Two ways</strong> to build your simulation</h2>
+    <p class="section-sub">Start from scratch with a new flowsheet, or load an existing .bkp and modify it — same plain-English workflow either way.</p>
+
+    <div class="hiw-cols">
+
+      <!-- LEFT: Build new -->
+      <div class="hiw-col">
+        <div class="hiw-col-header">
+          <span class="hiw-col-badge new-badge">new .bkp</span>
+          <span class="hiw-col-title">Build from scratch</span>
         </div>
-        <div class="step-content">
-          <div class="step-title">Enter your numbers</div>
-          <div class="step-desc">Fill in components, feed flow rate, pressure, and stage counts directly in the form. These values go straight to Aspen — the AI never sees them.</div>
-          <span class="step-tag">hallucination-free zone</span>
+        <div class="hiw-col-body">
+          <div class="workflow-steps">
+            <div class="workflow-step">
+              <div class="step-spine">
+                <div class="step-num">1</div>
+                <div class="step-line"></div>
+              </div>
+              <div class="step-content">
+                <div class="step-title">Enter your numbers</div>
+                <div class="step-desc">Fill in components, feed flow rate, pressure, and stage counts directly in the form. These values go straight to Aspen — the AI never sees them.</div>
+                <span class="step-tag">hallucination-free zone</span>
+              </div>
+            </div>
+            <div class="workflow-step">
+              <div class="step-spine">
+                <div class="step-num">2</div>
+                <div class="step-line"></div>
+              </div>
+              <div class="step-content">
+                <div class="step-title">Describe the structure</div>
+                <div class="step-desc">Write how your blocks connect in plain English. "COL1's bottoms feed into COL2" is enough. Claude extracts the block list and stream connections using a structured tool call.</div>
+                <span class="step-tag">claude-sonnet-4-6</span>
+              </div>
+            </div>
+            <div class="workflow-step">
+              <div class="step-spine">
+                <div class="step-num">3</div>
+              </div>
+              <div class="step-content">
+                <div class="step-title">Build and open in Aspen</div>
+                <div class="step-desc">Click build. aspenGhostCoder creates all blocks, wires every stream, sets stage counts and feed conditions, and saves a .bkp file ready to open in Aspen Plus.</div>
+                <span class="step-tag">Aspen Plus V14 COM API</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="workflow-step">
-        <div class="step-spine">
-          <div class="step-num">2</div>
-          <div class="step-line"></div>
+
+      <!-- RIGHT: Edit existing -->
+      <div class="hiw-col">
+        <div class="hiw-col-header">
+          <span class="hiw-col-badge edit-badge">edit .bkp</span>
+          <span class="hiw-col-title">Modify an existing file</span>
         </div>
-        <div class="step-content">
-          <div class="step-title">Describe the structure</div>
-          <div class="step-desc">Write how your blocks connect in plain English. "COL1's bottoms feed into COL2" is enough. Claude extracts the block list and stream connections using a structured tool call.</div>
-          <span class="step-tag">claude-sonnet-4-6</span>
+        <div class="hiw-col-body">
+          <div class="workflow-steps">
+            <div class="workflow-step">
+              <div class="step-spine">
+                <div class="step-num">1</div>
+                <div class="step-line"></div>
+              </div>
+              <div class="step-content">
+                <div class="step-title">Load your .bkp file</div>
+                <div class="step-desc">Point aspenGhostCoder at an existing Aspen Plus backup file. The COM interface opens it and reads the current block and stream topology — no manual re-entry needed.</div>
+                <span class="step-tag">reads existing topology</span>
+              </div>
+            </div>
+            <div class="workflow-step">
+              <div class="step-spine">
+                <div class="step-num">2</div>
+                <div class="step-line"></div>
+              </div>
+              <div class="step-content">
+                <div class="step-title">Describe what to change</div>
+                <div class="step-desc">Tell it what to add, remove, or reconnect. "Add a flash drum between HX-1 and COL1" or "Replace COL2 with a liquid–liquid extractor." Claude resolves the edit against the existing structure.</div>
+                <span class="step-tag">diff-aware parsing</span>
+              </div>
+            </div>
+            <div class="workflow-step">
+              <div class="step-spine">
+                <div class="step-num">3</div>
+              </div>
+              <div class="step-content">
+                <div class="step-title">Save the modified .bkp</div>
+                <div class="step-desc">Only the changed blocks and streams are touched. Everything else in your file — convergence settings, property methods, design specs — is preserved exactly as you left it.</div>
+                <span class="step-tag">non-destructive edits</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="workflow-step">
-        <div class="step-spine">
-          <div class="step-num">3</div>
-        </div>
-        <div class="step-content">
-          <div class="step-title">Build and open in Aspen</div>
-          <div class="step-desc">Click the build button. AEX creates the blocks, wires the streams, sets stage counts and feed conditions, and saves a .bkp file ready to open in Aspen Plus.</div>
-          <span class="step-tag">Aspen Plus V14 COM API</span>
-        </div>
-      </div>
+
     </div>
   </section>
 
@@ -445,7 +799,7 @@
 
   <!-- FOOTER -->
   <footer>
-    <div class="footer-copy">© 2026 AEX</div>
+    <div class="footer-copy">© 2026 aspenGhostCoder</div>
     <div class="footer-links">
       <a href="https://github.com">GitHub</a>
       <a href="mailto:manvi.umesh.dhekane@gmail.com,lucytcao@gmail.com">Contact</a>
