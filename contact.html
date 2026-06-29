@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Request Access — AEX</title>
+  <meta name="description" content="Request early access to AEX — the AI-powered Aspen Plus flowsheet builder for process engineers." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue:        #378ADD;
+      --blue-dark:   #185FA5;
+      --blue-dim:    rgba(55,138,221,0.10);
+      --blue-border: rgba(55,138,221,0.30);
+      --text:        #1a1a1a;
+      --text-sec:    #5a5a5a;
+      --text-ter:    #9a9a9a;
+      --bg:          #ffffff;
+      --bg-sec:      #f7f7f5;
+      --border:      rgba(0,0,0,0.10);
+      --border-med:  rgba(0,0,0,0.18);
+      --radius:      10px;
+      --mono:        'JetBrains Mono', monospace;
+      --sans:        'Inter', sans-serif;
+      --green:       #28C840;
+      --red:         #e03c3c;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --text:       #e8e8e6;
+        --text-sec:   #9a9896;
+        --text-ter:   #6a6864;
+        --bg:         #111110;
+        --bg-sec:     #1a1a18;
+        --border:     rgba(255,255,255,0.10);
+        --border-med: rgba(255,255,255,0.18);
+      }
+    }
+
+    body {
+      font-family: var(--sans);
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── NAV ── */
+    nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 48px;
+      border-bottom: 0.5px solid var(--border);
+      background: var(--bg);
+    }
+    .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .nav-logo-icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: var(--blue-dark);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .nav-logo-icon svg { width: 18px; height: 18px; }
+    .nav-wordmark { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; color: var(--text); }
+    .nav-wordmark span { color: var(--blue); }
+    .nav-back {
+      font-size: 13px; color: var(--text-sec); text-decoration: none;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .nav-back:hover { color: var(--text); }
+
+    /* ── MAIN LAYOUT ── */
+    main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      max-width: 1040px;
+      margin: 0 auto;
+      width: 100%;
+      padding: 64px 48px;
+      gap: 80px;
+      align-items: start;
+    }
+
+    /* ── LEFT PANEL ── */
+    .left-panel { position: sticky; top: 40px; }
+
+    .eyebrow {
+      display: inline-block; font-size: 11px; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--blue);
+      border: 0.5px solid var(--blue-border); border-radius: 20px;
+      padding: 4px 14px; margin-bottom: 24px;
+      font-family: var(--mono); font-weight: 500;
+    }
+
+    .left-panel h1 {
+      font-size: 32px; font-weight: 300; line-height: 1.2;
+      letter-spacing: -0.6px; margin-bottom: 16px;
+    }
+    .left-panel h1 strong { font-weight: 600; }
+
+    .left-panel p {
+      font-size: 14px; color: var(--text-sec);
+      line-height: 1.75; margin-bottom: 36px; max-width: 340px;
+    }
+
+    .info-list { display: flex; flex-direction: column; gap: 14px; }
+    .info-item { display: flex; align-items: flex-start; gap: 12px; }
+    .info-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--blue); flex-shrink: 0; margin-top: 7px;
+    }
+    .info-text { font-size: 13px; color: var(--text-sec); line-height: 1.6; }
+    .info-text strong { color: var(--text); font-weight: 500; }
+
+    /* ── FORM PANEL ── */
+    .form-panel {
+      border: 0.5px solid var(--border-med);
+      border-radius: var(--radius);
+      background: var(--bg);
+      overflow: hidden;
+    }
+
+    .form-header {
+      padding: 16px 24px;
+      border-bottom: 0.5px solid var(--border);
+      background: var(--bg-sec);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot-r { background: #FF5F57; }
+    .dot-y { background: #FEBC2E; }
+    .dot-g { background: #28C840; }
+    .form-header-label {
+      font-size: 12px; color: var(--text-ter);
+      font-family: var(--mono); margin-left: 8px;
+    }
+
+    form { padding: 28px 24px; display: flex; flex-direction: column; gap: 20px; }
+
+    .field { display: flex; flex-direction: column; gap: 7px; }
+
+    label {
+      font-size: 12px; font-weight: 500; color: var(--text-sec);
+      letter-spacing: 0.04em; text-transform: uppercase;
+      font-family: var(--mono);
+    }
+    label .required { color: var(--blue); margin-left: 2px; }
+
+    input, select, textarea {
+      font-family: var(--sans); font-size: 14px; color: var(--text);
+      background: var(--bg-sec); border: 0.5px solid var(--border-med);
+      border-radius: 7px; padding: 10px 13px;
+      outline: none; transition: border-color 0.15s, box-shadow 0.15s;
+      width: 100%;
+      -webkit-appearance: none;
+    }
+    input::placeholder, textarea::placeholder { color: var(--text-ter); }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px var(--blue-dim);
+    }
+    input.error, select.error, textarea.error {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(224,60,60,0.08);
+    }
+
+    select {
+      cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239a9a9a' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 13px center;
+      padding-right: 36px;
+    }
+    @media (prefers-color-scheme: dark) {
+      select {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236a6864' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      }
+    }
+
+    textarea { resize: vertical; min-height: 88px; line-height: 1.6; }
+
+    .field-error {
+      font-size: 11px; color: var(--red);
+      font-family: var(--mono); display: none;
+    }
+    .field-error.visible { display: block; }
+
+    .form-divider {
+      height: 0.5px; background: var(--border); margin: 4px 0;
+    }
+
+    .btn-submit {
+      padding: 12px 24px;
+      background: var(--blue-dark); color: #fff;
+      border: none; border-radius: 7px;
+      font-size: 14px; font-weight: 500;
+      cursor: pointer; font-family: var(--sans);
+      width: 100%; transition: background 0.15s, opacity 0.15s;
+      position: relative;
+    }
+    .btn-submit:hover { background: #1268b3; }
+    .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .btn-submit .btn-text { transition: opacity 0.15s; }
+    .btn-submit .btn-spinner {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 18px; height: 18px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: none;
+    }
+    .btn-submit.loading .btn-text { opacity: 0; }
+    .btn-submit.loading .btn-spinner { display: block; }
+    @keyframes spin { to { transform: translate(-50%,-50%) rotate(360deg); } }
+
+    .form-note {
+      font-size: 11px; color: var(--text-ter);
+      text-align: center; line-height: 1.6;
+      font-family: var(--mono);
+    }
+
+    /* ── SUCCESS STATE ── */
+    .success-state {
+      padding: 52px 24px;
+      text-align: center;
+      display: none;
+    }
+    .success-state.visible { display: block; }
+    form.hidden { display: none; }
+
+    .success-icon {
+      width: 48px; height: 48px; border-radius: 50%;
+      background: rgba(40,200,64,0.12);
+      border: 0.5px solid rgba(40,200,64,0.3);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 20px; font-size: 22px;
+    }
+    .success-title {
+      font-size: 18px; font-weight: 500; margin-bottom: 8px;
+    }
+    .success-desc {
+      font-size: 13px; color: var(--text-sec); line-height: 1.7;
+      margin-bottom: 28px;
+    }
+    .btn-back {
+      display: inline-block; padding: 10px 22px;
+      border: 0.5px solid var(--border-med); border-radius: 7px;
+      font-size: 13px; color: var(--text-sec);
+      text-decoration: none; font-family: var(--sans);
+      transition: background 0.15s, color 0.15s;
+    }
+    .btn-back:hover { background: var(--bg-sec); color: var(--text); }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 20px 48px;
+      border-top: 0.5px solid var(--border);
+      display: flex; justify-content: space-between;
+      align-items: center; flex-wrap: wrap; gap: 12px;
+    }
+    .footer-copy { font-size: 12px; color: var(--text-ter); }
+    .footer-links { display: flex; gap: 20px; }
+    .footer-links a {
+      font-size: 12px; color: var(--text-ter); text-decoration: none;
+    }
+    .footer-links a:hover { color: var(--text-sec); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 720px) {
+      nav { padding: 14px 20px; }
+      main {
+        grid-template-columns: 1fr;
+        padding: 40px 20px;
+        gap: 40px;
+      }
+      .left-panel { position: static; }
+      footer { padding: 16px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a class="nav-logo" href="/">
+      <div class="nav-logo-icon">
+        <svg viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="9" cy="5" r="2.5" stroke="white" stroke-width="1.2"/>
+          <circle cx="4" cy="13" r="2.5" stroke="white" stroke-width="1.2"/>
+          <circle cx="14" cy="13" r="2.5" stroke="white" stroke-width="1.2"/>
+          <line x1="9" y1="7.5" x2="4" y2="10.5" stroke="white" stroke-width="1"/>
+          <line x1="9" y1="7.5" x2="14" y2="10.5" stroke="white" stroke-width="1"/>
+        </svg>
+      </div>
+      <span class="nav-wordmark">A<span>EX</span></span>
+    </a>
+    <a class="nav-back" href="/">← Back to home</a>
+  </nav>
+
+  <main>
+
+    <!-- LEFT: context -->
+    <div class="left-panel">
+      <div class="eyebrow">Early access</div>
+      <h1>Tell us about<br><strong>your setup.</strong></h1>
+      <p>AEX is in early access for process engineers running Aspen Plus on Windows. Fill in the form and we'll be in touch with next steps.</p>
+
+      <div class="info-list">
+        <div class="info-item">
+          <div class="info-dot"></div>
+          <div class="info-text"><strong>Windows + Aspen Plus V14+ required.</strong> AEX uses the COM automation interface which is Windows-only.</div>
+        </div>
+        <div class="info-item">
+          <div class="info-dot"></div>
+          <div class="info-text"><strong>No waitlist fee.</strong> Early access is free while we refine the tool with real engineering workflows.</div>
+        </div>
+        <div class="info-item">
+          <div class="info-dot"></div>
+          <div class="info-text"><strong>Your data stays on your machine.</strong> Only structural descriptions of your flowsheet are sent externally — never your process data or .bkp files.</div>
+        </div>
+        <div class="info-item">
+          <div class="info-dot"></div>
+          <div class="info-text"><strong>We respond within 1–2 business days</strong> with setup instructions and an API key.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: form -->
+    <div class="form-panel">
+      <div class="form-header">
+        <div class="dot dot-r"></div>
+        <div class="dot dot-y"></div>
+        <div class="dot dot-g"></div>
+        <span class="form-header-label">access-request.form</span>
+      </div>
+
+      <form id="contact-form" action="https://formspree.io/f/xlgyledp" method="POST" novalidate>
+
+        <div class="field">
+          <label for="name">Name <span class="required">*</span></label>
+          <input type="text" id="name" name="name" placeholder="Jane Smith" autocomplete="name" />
+          <span class="field-error" id="name-error">Please enter your name.</span>
+        </div>
+
+        <div class="field">
+          <label for="company">Company / Institution <span class="required">*</span></label>
+          <input type="text" id="company" name="company" placeholder="Acme Chemical Co." autocomplete="organization" />
+          <span class="field-error" id="company-error">Please enter your company or institution.</span>
+        </div>
+
+        <div class="field">
+          <label for="email">Work email <span class="required">*</span></label>
+          <input type="email" id="email" name="email" placeholder="jane@acmechem.com" autocomplete="email" />
+          <span class="field-error" id="email-error">Please enter a valid email address.</span>
+        </div>
+
+        <div class="field">
+          <label for="aspen-version">Aspen Plus version <span class="required">*</span></label>
+          <select id="aspen-version" name="aspen_version">
+            <option value="" disabled selected>Select your version…</option>
+            <option value="V14">V14</option>
+            <option value="V12.1">V12.1</option>
+            <option value="V12">V12</option>
+            <option value="V11">V11</option>
+            <option value="other">Other / Not sure</option>
+          </select>
+          <span class="field-error" id="version-error">Please select your Aspen Plus version.</span>
+        </div>
+
+        <div class="field">
+          <label for="use-case">What will you use AEX for? <span style="color:var(--text-ter);font-weight:400">(optional)</span></label>
+          <textarea id="use-case" name="use_case" placeholder="e.g. distillation column sequencing for a solvent recovery unit…"></textarea>
+        </div>
+
+        <div class="form-divider"></div>
+
+        <button type="submit" class="btn-submit" id="submit-btn">
+          <span class="btn-text">Send request</span>
+          <span class="btn-spinner"></span>
+        </button>
+
+        <p class="form-note">We'll reply to your work email within 1–2 business days.</p>
+
+      </form>
+
+      <!-- Success state (shown after submission) -->
+      <div class="success-state" id="success-state">
+        <div class="success-icon">✓</div>
+        <div class="success-title">Request received</div>
+        <div class="success-desc">
+          We'll review your details and follow up at your email within 1–2 business days with setup instructions.
+        </div>
+        <a class="btn-back" href="/">Back to home</a>
+      </div>
+    </div>
+
+  </main>
+
+  <footer>
+    <div class="footer-copy">© 2026 AEX</div>
+    <div class="footer-links">
+      <a href="mailto:manvi.umesh.dhekane@gmail.com,lucytcao@gmail.com">Contact</a>
+    </div>
+  </footer>
+
+  <script>
+    const form = document.getElementById('contact-form');
+    const submitBtn = document.getElementById('submit-btn');
+    const successState = document.getElementById('success-state');
+
+    // Field validation config
+    const fields = [
+      {
+        id: 'name',
+        errorId: 'name-error',
+        validate: v => v.trim().length > 0
+      },
+      {
+        id: 'company',
+        errorId: 'company-error',
+        validate: v => v.trim().length > 0
+      },
+      {
+        id: 'email',
+        errorId: 'email-error',
+        validate: v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim())
+      },
+      {
+        id: 'aspen-version',
+        errorId: 'version-error',
+        validate: v => v !== ''
+      }
+    ];
+
+    function validateField(field) {
+      const el = document.getElementById(field.id);
+      const errorEl = document.getElementById(field.errorId);
+      const valid = field.validate(el.value);
+      el.classList.toggle('error', !valid);
+      errorEl.classList.toggle('visible', !valid);
+      return valid;
+    }
+
+    // Clear error on input
+    fields.forEach(field => {
+      const el = document.getElementById(field.id);
+      el.addEventListener('input', () => validateField(field));
+      el.addEventListener('change', () => validateField(field));
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      // Validate all fields
+      const allValid = fields.map(validateField).every(Boolean);
+      if (!allValid) return;
+
+      // Show loading state
+      submitBtn.classList.add('loading');
+      submitBtn.disabled = true;
+
+      try {
+        const response = await fetch(form.action, {
+          method: 'POST',
+          body: new FormData(form),
+          headers: { 'Accept': 'application/json' }
+        });
+
+        if (response.ok) {
+          // Show success
+          form.classList.add('hidden');
+          successState.classList.add('visible');
+        } else {
+          // Formspree returned an error
+          const data = await response.json();
+          const msg = (data.errors && data.errors.map(e => e.message).join(', ')) || 'Something went wrong. Please try again.';
+          alert(msg);
+          submitBtn.classList.remove('loading');
+          submitBtn.disabled = false;
+        }
+      } catch (err) {
+        alert('Network error — please check your connection and try again.');
+        submitBtn.classList.remove('loading');
+        submitBtn.disabled = false;
+      }
+    });
+  </script>
+
+</body>
+</html>
