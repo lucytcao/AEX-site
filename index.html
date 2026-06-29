@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AEX — AI-powered Aspen Plus flowsheet builder</title>
+  <meta name="description" content="AEX transforms process descriptions into working Aspen Plus simulations. Build and edit flowsheet blocks, streams, and thermodynamic parameters automatically." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
@@ -547,33 +548,28 @@
     const allLabels = ["lbl-feed","lbl-s1","lbl-s2","lbl-s3","lbl-dist1","lbl-recycle"];
 
     let stepIdx = 0;
-    const dotAnims = {}; // store per-dot animation state
+    const dotAnims = {};
 
     function applyStep(s) {
-      // nodes
       allNodes.forEach(id => {
         const el = document.getElementById(id);
         if (!el) return;
         el.classList.toggle('active', s.nodes.includes(id));
       });
-      // streams
       allStreams.forEach(id => {
         const el = document.getElementById(id);
         if (!el) return;
         el.classList.toggle('active', s.streams.includes(id));
       });
-      // labels
       allLabels.forEach(id => {
         const el = document.getElementById(id);
         if (!el) return;
         el.style.opacity = s.labels.includes(id) ? '1' : '0';
       });
-      // progress
       document.getElementById('fs-prog').style.width = s.pct + '%';
       document.getElementById('fs-status').textContent = s.label;
     }
 
-    // Animate a dot along a line segment
     function animateDotLine(dotId, x1, y1, x2, y2, dur, onDone) {
       const el = document.getElementById(dotId);
       if (!el) { onDone && onDone(); return; }
@@ -603,21 +599,18 @@
     function runStep() {
       const s = steps[stepIdx];
       applyStep(s);
-      // fire dot animations for this step
       s.dots.forEach(dotId => {
         const cfg = dotConfigs[dotId];
         if (cfg) animateDotLine(dotId, cfg.x1, cfg.y1, cfg.x2, cfg.y2, 700);
       });
       stepIdx = (stepIdx + 1) % steps.length;
       if (stepIdx === 0) {
-        // brief pause at completion before restart
         setTimeout(() => { stepIdx = 0; setTimeout(runStep, 400); }, 1800);
       } else {
         setTimeout(runStep, stepIdx === steps.length - 1 ? 1200 : 750);
       }
     }
 
-    // Start after a short delay
     setTimeout(runStep, 600);
   })();
   </script>
@@ -791,8 +784,7 @@
       <h2>Ready to stop clicking through Aspen?<br><strong>Start describing instead.</strong></h2>
       <p>Currently in early access for process engineers. Windows + Aspen Plus V14 required.</p>
       <div class="btn-row">
-        <a class="btn-primary" href="mailto:manvi.umesh.dhekane@gmail.com,lucytcao@gmail.com">Request early access</a>
-        <a class="btn-ghost" href="https://github.com">View on GitHub</a>
+        <a class="btn-primary" href="#" onclick="window.location.href='mailto:manvi.umesh.dhekane@gmail.com,lucytcao@gmail.com?subject=AEX%20Early%20Access%20Request&body=Hi%2C%0A%0AI%27d%20like%20to%20request%20early%20access%20to%20AEX.%0A%0AName%3A%0ACompany%2FInstitution%3A%0AAspen%20Plus%20version%3A%0A%0AWhat%20I%27m%20hoping%20to%20use%20AEX%20for%3A%0A'; return false;">Request early access</a>
       </div>
     </div>
   </div>
@@ -801,7 +793,6 @@
   <footer>
     <div class="footer-copy">© 2026 AEX</div>
     <div class="footer-links">
-      <a href="https://github.com">GitHub</a>
       <a href="mailto:manvi.umesh.dhekane@gmail.com,lucytcao@gmail.com">Contact</a>
     </div>
   </footer>
